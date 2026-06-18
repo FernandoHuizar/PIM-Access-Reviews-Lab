@@ -43,9 +43,11 @@ What Was Built
 Eligible Role Assignment
 
 Assigned pim.user as eligible for the User Administrator role rather than granting it permanently. Before PIM, this user had zero active role assignments.
+
 <img width="865" height="602" alt="image" src="https://github.com/user-attachments/assets/1aee8e89-ca6c-4690-bdd3-cc9bbff8db73" />
 
 Activation Settings Configured on User Administrator Role
+
 <img width="1231" height="868" alt="image" src="https://github.com/user-attachments/assets/b1ed6e9c-bc68-47f8-8a8a-5ed10676d819" />
 
 SettingValueMax activation duration8 hoursRequire MFA on activationYesRequire justificationYesRequire approvalYesApproverpim.approver
