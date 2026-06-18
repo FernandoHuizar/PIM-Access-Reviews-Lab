@@ -43,8 +43,10 @@ What Was Built
 Eligible Role Assignment
 
 Assigned pim.user as eligible for the User Administrator role rather than granting it permanently. Before PIM, this user had zero active role assignments.
+<img width="865" height="602" alt="image" src="https://github.com/user-attachments/assets/1aee8e89-ca6c-4690-bdd3-cc9bbff8db73" />
 
 Activation Settings Configured on User Administrator Role
+<img width="1231" height="868" alt="image" src="https://github.com/user-attachments/assets/b1ed6e9c-bc68-47f8-8a8a-5ed10676d819" />
 
 SettingValueMax activation duration8 hoursRequire MFA on activationYesRequire justificationYesRequire approvalYesApproverpim.approver
 
@@ -62,6 +64,7 @@ Access set to expire automatically at end of 2-hour window
 Audit Trail
 
 Every action was captured in PIM Resource Audit logs with timestamps, actor, action type, and status — demonstrating the compliance-ready logging that audit teams rely on for SOX and access control verification.
+<img width="1598" height="536" alt="image" src="https://github.com/user-attachments/assets/f94bfa2a-878f-4f3a-a50b-76be46601576" />
 
 
 Part 2: Access Reviews
@@ -77,12 +80,14 @@ Group reviewed: GRP-Finance-Users (security group with pim.user and review.user 
 SettingValueReview nameCORP-Finance-Users-Access-ReviewScopeAll usersReviewerFernando Huizar (Global Admin)FrequencyQuarterlyDuration3 daysEndAfter 3 occurrencesAuto-apply resultsEnabledIf no responseRemove accessDecision helpersFlag users inactive 30+ days, User-to-Group affiliationJustification requiredYes
 
 Auto-apply and remove-on-no-response means access is enforced automatically without manual follow-up. If a reviewer doesn't act within 3 days, the user loses access by default — the secure outcome.
+<img width="1596" height="566" alt="image" src="https://github.com/user-attachments/assets/fb4f6293-3203-42df-8237-bbb5b8afae67" />
 
 Review 2: Privileged Role Review
 
 Created directly from PIM > Entra ID Roles > Access Reviews to review who holds the User Administrator role and whether continued assignment is justified.
 
 SettingValueReview nameCORP-Privileged-Role-Access-ReviewRole reviewedUser AdministratorAssignment typeAll active and eligible assignmentsReviewerFernando Huizar (Global Admin)FrequencyQuarterlyDuration3 daysEndAfter 3 occurrencesAuto-apply resultsEnabledIf no responseRemove accessShow recommendationsEnabledJustification requiredYes
+<img width="1112" height="660" alt="image" src="https://github.com/user-attachments/assets/2d3b22e2-b72e-4ce3-a176-65520449b2b6" />
 
 
 Key IAM Concepts Demonstrated
