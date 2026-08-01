@@ -37,7 +37,7 @@ Each role was configured with identical activation requirements:
 
 This represents **100% of admin roles configured in this tenant** operating under JIT access rather than standing assignment.
 
-![PIM Role Settings - Groups Administrator](SCREENSHOT_1_HERE)
+<img width="1154" height="687" alt="image" src="https://github.com/user-attachments/assets/57ba1a2d-34ef-473b-806a-cd04a2dea424" />
 
 ### Full Activation Workflow Tested
 
@@ -65,7 +65,7 @@ Created a batch of **30 simulated user accounts** and added them to a test group
 
 The review was completed through Microsoft's self-service reviewer portal (myaccess.microsoft.com), the same interface used by real employees and managers to complete access certifications in production environments, distinct from the admin configuration console.
 
-![Access Review Results Summary](SCREENSHOT_2_HERE)
+<img width="1005" height="623" alt="image" src="https://github.com/user-attachments/assets/ed9e1d9d-feab-4637-9798-b1758c3db1c6" />
 
 ### Results
 
@@ -103,7 +103,7 @@ Both packages were configured with:
 
 A **Separation of Duties rule** was configured marking these two packages as mutually incompatible.
 
-![Separation of Duties Configuration](SCREENSHOT_3_HERE)
+<img width="1151" height="355" alt="image" src="https://github.com/user-attachments/assets/cb9c896a-d7a4-4eb7-9723-4d260488edd1" />
 
 ### Verification
 
@@ -114,7 +114,7 @@ Tested the SoD rule directly:
 
 Entra returned an explicit failure, citing the conflicting active assignment: `activeAccessPackageAssignmentRequests: ["Finance-Requester-Access"]`.
 
-![SoD Conflict Blocked](SCREENSHOT_4_HERE)
+<img width="325" height="151" alt="image" src="https://github.com/user-attachments/assets/c1dd308c-cadd-47d4-a4ff-a57bff40e596" />
 
 This confirms the policy is not just configured but actively enforced, a user genuinely cannot hold both conflicting access packages at the same time.
 
