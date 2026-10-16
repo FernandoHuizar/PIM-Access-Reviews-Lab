@@ -1,135 +1,85 @@
-# PIM & Access Reviews Lab
+# PIM and Access Reviews Lab
 
-**Tools:** Microsoft Entra ID, Privileged Identity Management, Identity Governance, Entitlement Management
+**The problem:** admins often keep their admin rights all the time, people collect access they no longer need, and sometimes one person ends up able to both request and approve the same thing.
 
-## Overview
+**What I did:** in Microsoft Entra ID, I made admin rights temporary and approval-based, ran an access review on 30 users that removed 8, and set a rule that blocks one person from holding two conflicting kinds of access.
 
-This lab demonstrates how enterprise IAM teams control, certify, and govern access using Microsoft Entra ID Premium P2 features. It covers three core identity governance capabilities:
+*Screenshot lab from earlier in my learning. My main project is [Havlund Pharma](https://github.com/FernandoHuizar/havlund-identity-lifecycle).*
 
-- **Privileged Identity Management (PIM)** — eliminating standing admin access across multiple roles through just-in-time activation with approval workflows
-- **Access Reviews** — running a large-scale certification campaign to recertify access and automatically revoke stale or unjustified assignments
-- **Entitlement Management with Separation of Duties (SoD)** — preventing conflicting access combinations from being held by the same identity
+## IAM ideas this lab shows
 
-## Part 1: Privileged Identity Management (PIM)
+| Idea | What it means | Where it shows up here |
+|---|---|---|
+| Least privilege | People get only the access they need, for only as long as they need it | Admin roles are off until requested |
+| Just-in-time admin access | Admin rights are turned on for a few hours when needed, then turn off by themselves | 4 admin roles set up this way with PIM |
+| Access review | Regularly asking "does this person still need this?" | 30 users reviewed, 8 lost access |
+| Separation of duties | One person can't hold two jobs that should check each other | Can't be both a finance requester and approver |
+| Audit trail | A record of who did what and when | Every request, approval and review decision is logged |
 
-### The Problem PIM Solves
+## Part 1: Admin rights only when needed (PIM)
 
-In traditional environments, privileged users hold admin roles permanently. If an account is compromised, the attacker has standing access to everything that role permits. PIM removes standing access entirely, users are eligible for a role but must request it, justify it, get it approved, and access expires automatically.
+**Why:** if an account with permanent admin rights gets stolen, the attacker gets those rights too. With PIM (Privileged Identity Management), a user is *eligible* for a role but has to ask for it each time.
 
-### What Was Built
-
-Converted **4 admin roles** from standing/permanent access to eligible, just-in-time access:
-
-- User Administrator
-- Groups Administrator
-- Intune Administrator
-- Conditional Access Administrator
-
-Each role was configured with identical activation requirements:
+I changed 4 admin roles from permanent to "request when needed": User Administrator, Groups Administrator, Intune Administrator and Conditional Access Administrator. Each one needs:
 
 | Setting | Value |
 |---|---|
-| Require Azure MFA on activation | Yes |
-| Require justification | Yes |
-| Require approval | Yes |
-| Approver | PIM Approver |
-| Max activation duration | 8 hours |
+| MFA when turning it on | Yes |
+| A reason | Yes |
+| Approval | Yes, by a separate approver account |
+| Longest it can stay on | 8 hours |
 
-This represents **100% of admin roles configured in this tenant** operating under JIT access rather than standing assignment.
+<img width="1154" height="687" alt="PIM role settings" src="https://github.com/user-attachments/assets/57ba1a2d-34ef-473b-806a-cd04a2dea424" />
 
-<img width="1154" height="687" alt="image" src="https://github.com/user-attachments/assets/57ba1a2d-34ef-473b-806a-cd04a2dea424" />
+**Test:** a test user asked for User Administrator with a reason. The approver approved it, the user had the role for 2 hours, and then it turned off by itself. Each step showed up in the PIM audit log.
 
-### Full Activation Workflow Tested
+## Part 2: Access review on 30 users
 
-PIM Test User requested activation of the User Administrator role, providing justification tied to a real support scenario. The request entered a pending state, was reviewed and approved by PIM Approver, and access was granted for a fixed 2-hour window before automatically expiring.
+**Why:** access piles up over time. A review asks the person responsible to confirm each person still needs it.
 
-Every action was captured in PIM Resource Audit logs with timestamps, actor, action type, and status.
-
-## Part 2: Access Reviews at Scale
-
-### The Problem Access Reviews Solve
-
-Users accumulate access over time. Without periodic recertification, organizations end up with access sprawl that violates least privilege. Access Reviews automate the question: does this person still need this access?
-
-### What Was Built
-
-Created a batch of **30 simulated user accounts** and added them to a test group (`GRP-AccessReview-Batch`). Launched a one-time access review campaign (`CORP-AccessReview-Batch-Q3`) targeting all 30 members, with:
+I created 30 test users in one group and started a review of that group:
 
 | Setting | Value |
 |---|---|
-| Reviewer | Fernando Huizar |
-| Duration | 3 days |
-| Auto-apply results | Enabled |
-| If no response | Remove access |
-| Justification required | Yes |
+| Reviewer | Me |
+| Length | 3 days |
+| Apply results automatically | Yes |
+| If the reviewer doesn't answer | Remove access |
+| Reason required | Yes |
 
-The review was completed through Microsoft's self-service reviewer portal (myaccess.microsoft.com), the same interface used by real employees and managers to complete access certifications in production environments, distinct from the admin configuration console.
+I did the review from the My Access portal, the same page a real manager would use.
 
-<img width="1005" height="623" alt="image" src="https://github.com/user-attachments/assets/ed9e1d9d-feab-4637-9798-b1758c3db1c6" />
+<img width="1005" height="623" alt="Access review in My Access" src="https://github.com/user-attachments/assets/ed9e1d9d-feab-4637-9798-b1758c3db1c6" />
 
-### Results
+**Results:**
 
 | Outcome | Count |
 |---|---|
-| Approved | 22 |
-| Denied (explicit) | 5 |
-| Removed (no response) | 3 |
-| **Total access revoked** | **8** |
-| Total reviewed | 30 |
+| Kept | 22 |
+| Denied | 5 |
+| Removed because no one answered | 3 |
+| **Access removed in total** | **8 of 30** |
 
-8 of 30 accounts (27%) lost access through this single certification campaign, demonstrating how access reviews catch and remediate unjustified or stale privileged access at scale.
+## Part 3: Separation of duties
 
-## Part 3: Separation of Duties (Entitlement Management)
+**Why:** someone who can submit a finance request shouldn't also be able to approve it.
 
-### The Problem SoD Solves
+I made two access packages (bundles of access people can request): **Finance-Requester-Access** and **Finance-Approver-Access**. Both need approval, expire after 90 days and get reviewed every quarter. Then I marked them as not allowed together.
 
-Certain role combinations create unacceptable risk when held by the same person, for example, someone who can submit a financial request and also approve it. Separation of Duties policies prevent this by making two access packages mutually exclusive.
+<img width="1151" height="355" alt="Separation of duties setting" src="https://github.com/user-attachments/assets/cb9c896a-d7a4-4eb7-9723-4d260488edd1" />
 
-### What Was Built
+**Test:**
+1. Gave a test user Finance-Requester-Access. It worked.
+2. Tried to give the same user Finance-Approver-Access. **Entra blocked it** and named the conflicting package.
 
-Created two access packages in a shared catalog (`Finance-Access-Catalog`):
+<img width="325" height="151" alt="Assignment blocked" src="https://github.com/user-attachments/assets/c1dd308c-cadd-47d4-a4ff-a57bff40e596" />
 
-- **Finance-Requester-Access** — access for employees who submit finance requests
-- **Finance-Approver-Access** — access for employees who approve finance requests
+## What I learned
 
-Both packages were configured with:
+- Temporary admin rights cut risk a lot, but approvers have to actually check the reason.
+- "Remove if no one answers" is a strong setting. It cleans up access, but managers need a heads-up before the review starts.
+- A separation of duties rule should be tested, not just set. I tried to break it to prove it works.
 
-| Setting | Value |
-|---|---|
-| Approval required | Yes |
-| Access expiration | 90 days |
-| Access reviews | Quarterly, 7-day duration |
-| If reviewer doesn't respond | Remove access |
+## Built with
 
-A **Separation of Duties rule** was configured marking these two packages as mutually incompatible.
-
-<img width="1151" height="355" alt="image" src="https://github.com/user-attachments/assets/cb9c896a-d7a4-4eb7-9723-4d260488edd1" />
-
-### Verification
-
-Tested the SoD rule directly:
-
-1. Assigned PIM Test User to Finance-Requester-Access — succeeded
-2. Attempted to assign the same user to Finance-Approver-Access — **blocked**
-
-Entra returned an explicit failure, citing the conflicting active assignment: `activeAccessPackageAssignmentRequests: ["Finance-Requester-Access"]`.
-
-<img width="325" height="151" alt="image" src="https://github.com/user-attachments/assets/c1dd308c-cadd-47d4-a4ff-a57bff40e596" />
-
-This confirms the policy is not just configured but actively enforced, a user genuinely cannot hold both conflicting access packages at the same time.
-
-## Key IAM Concepts Demonstrated
-
-- **Just-in-Time Access** — no standing privilege across any admin role in the tenant
-- **Zero Trust** — every activation requires MFA, justification, and human approval
-- **Least Privilege** — access reviews enforce that users only retain access they actively need
-- **Separation of Duties** — conflicting access packages are technically prevented from co-assignment, not just policy on paper
-- **Audit Readiness** — every PIM activation, access review decision, and SoD enforcement action is logged with actor, timestamp, and outcome
-
-## Tools Used
-
-- Microsoft Entra ID Premium P2
-- Privileged Identity Management (PIM)
-- Identity Governance — Access Reviews
-- Identity Governance — Entitlement Management
-- Microsoft Entra admin center / myaccess.microsoft.com
+Microsoft Entra ID P2 (trial), Privileged Identity Management, Access Reviews, Entitlement Management, My Access portal.
